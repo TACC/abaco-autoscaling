@@ -17,6 +17,8 @@ Use dynamic inventory (e.g. on just computes):
 
     ansible -i get_inventory computes -a uptime
 
+## deploy instances
+
 Spin up all hosts that don't already exist:
 
     ansible-playbook -i get_inventory instances_up.yml
@@ -24,4 +26,8 @@ Spin up all hosts that don't already exist:
 Spin down all hosts that don't already exist:
 
     ansible-playbook -i get_inventory instances_down.yml
-~                                                              
+                                                              
+
+## install docker 
+
+    ansible-playbook -i get_inventory deploy-abaco.yml
