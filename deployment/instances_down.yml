@@ -9,7 +9,7 @@
     local_action: command whoami
     register: local_username
 
-  - debug: var=local_username
+  #- debug: var=local_username
 
   - name: create computes
     os_server:
@@ -25,8 +25,8 @@
         group: mpackard-computes
       auto_ip: no
     with_items:
-      - "{{local_username}}-compute1"
-      - "{{local_username}}-compute2"
+      - "{{local_username.stdout}}-compute1"
+      - "{{local_username.stdout}}-compute2"
 
   - name: create servers
     os_server:
@@ -42,5 +42,5 @@
         group: mpackard-servers
       auto_ip: no
     with_items:
-      - "{{local_username}}-server1"
+      - "{{local_username.stdout}}-server1"
 

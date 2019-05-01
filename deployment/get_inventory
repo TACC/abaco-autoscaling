@@ -12,6 +12,13 @@ import getpass
 sys.dont_write_bytecode = True
 #openstack.enable_logging(debug=True)
 
+def openstack_connect():
+  try: 
+    return openstack.connect()
+  except:
+    print("Failed to connect to Openstack. Are your OS_ variables set (from openrc)?")
+    sys.exit(1)
+
 
 def get_cached_networks(username):
   with open('/tmp/'+username+'-networks.json') as f:
@@ -20,7 +27,7 @@ def get_cached_networks(username):
 
 def cache_networks(username):
   data = []
-  conn = openstack.connect()
+  conn = openstack_connect()
   for s in conn.network.networks(project_id=os.environ['OS_PROJECT_ID']):
     data.append(s.to_dict())
   with open('/tmp/'+username+'-networks.json', 'w') as fp:
@@ -34,7 +41,7 @@ def get_cached_servers(username):
 
 def cache_servers(username):
   data = []
-  conn = openstack.connect()
+  conn = openstack_connect()
   for s in conn.compute.servers():
     data.append(s.to_dict())
   with open('/tmp/'+username+'-servers.json', 'w') as fp:
