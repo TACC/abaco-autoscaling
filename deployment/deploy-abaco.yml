@@ -1,0 +1,39 @@
+---
+
+- hosts: all
+  become: true
+
+  tasks:
+
+  - name: add devicemapper and other support packages
+    yum: 
+      name: ['epel-release', 'device-mapper-persistent-data', 'lvm2']
+      state: present
+  
+  - name: Add Docker CE repository
+    get_url:
+      url: https://download.docker.com/linux/centos/docker-ce.repo
+      dest: /etc/yum.repos.d/docker-ce.repo
+      force: yes
+      owner: root
+      group: root
+      mode: 0644
+  
+  - name: Install Docker CE
+    yum:
+      name: docker-ce
+      state: present
+      enablerepo: docker-ce-stable
+  
+  - name: add daemon config directory
+    file: path=/etc/docker state=directory
+  
+  - name: install docker compose
+    get_url:
+      url: https://github.com/docker/compose/releases/download/1.24.0/docker-compose-Linux-x86_64
+      dest: /usr/local/bin/docker-compose
+      force: yes
+      mode: 0755
+  
+  - name: ensure docker is running
+    service: name=docker state=started enabled=yes

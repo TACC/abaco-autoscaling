@@ -4,26 +4,14 @@
   gather_facts: no
   tasks:
 
-  - name: remove instances
-    os_server:
-      state: absent
-      name: "{{item}}"
-      image: 5e559e1c-4915-457e-bb02-bdc939a4232c
-      key_name: autoscaling_abaco
-      timeout: 200
-      flavor: m1.tiny
-      nics:
-        - net-id: e34992da-2361-4b12-9c05-d41680f90fc0
-      meta:
-        group: computes
-      auto_ip: no
-    with_items:
-      - compute1
-      - compute2
-      - compute3
-      - compute4
+  - name: get the username running the deploy
+    become: false
+    local_action: command whoami
+    register: local_username
 
-  - name: remove servers
+  - debug: var=local_username
+
+  - name: create computes
     os_server:
       state: absent
       name: "{{item}}"
@@ -34,8 +22,25 @@
       nics:
         - net-id: e34992da-2361-4b12-9c05-d41680f90fc0
       meta:
-        group: servers
+        group: mpackard-computes
       auto_ip: no
     with_items:
-      - server1
+      - "{{local_username}}-compute1"
+      - "{{local_username}}-compute2"
+
+  - name: create servers
+    os_server:
+      state: absent
+      name: "{{item}}"
+      image: 5e559e1c-4915-457e-bb02-bdc939a4232c
+      key_name: autoscaling_abaco
+      timeout: 200
+      flavor: m1.tiny
+      nics:
+        - net-id: e34992da-2361-4b12-9c05-d41680f90fc0
+      meta:
+        group: mpackard-servers
+      auto_ip: no
+    with_items:
+      - "{{local_username}}-server1"
 
