@@ -1,0 +1,9 @@
+---
+
+- hosts: localhost
+
+  tasks:
+
+  - debug: var=ansible_ssh_host
+
+  - debug: var={{  ansible_ssh_host.split(".")[3] }}

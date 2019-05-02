@@ -2,9 +2,11 @@
 
 - hosts: all
   become: true
+  vars:
+ 
+    abaco_host_id: "{{  ansible_ssh_host.split('.')[3] }}"
 
   tasks:
-
 
   - name: get the username running the deploy
     become: false
@@ -75,6 +77,7 @@
       - clientg.log
       - spawner.log
       - health.log
+      - worker.log
 
   - name: create log files
     copy:
@@ -86,6 +89,7 @@
       - clientg.log
       - spawner.log
       - health.log
+      - worker.log
  
   - name: abaco.conf
     template:
@@ -102,6 +106,9 @@
   - name: docker compose up 
     become: yes
     become_user: apim
+    environment:
+      abaco_path: /home/apim
+      TAG: dev
     shell: /usr/local/bin/docker-compose -f docker-compose-compute.yml up -d
     args:
       chdir: /home/apim
