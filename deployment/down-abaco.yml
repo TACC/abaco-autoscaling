@@ -1,0 +1,14 @@
+---
+
+- hosts: all
+  become: true
+
+  tasks:
+
+  - name: docker compose down
+    become: yes
+    become_user: apim
+    shell: /usr/local/bin/docker-compose -f docker-compose-compute.yml down
+    args:
+      chdir: /home/apim
+

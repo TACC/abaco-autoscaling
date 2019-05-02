@@ -21,13 +21,17 @@ Use dynamic inventory (e.g. on just computes):
 
 Spin up all hosts that don't already exist:
 
-    ansible-playbook -i get_inventory instances_up.yml
+    ansible-playbook -i get_inventory up-instances.yml
 
 Spin down all hosts that don't already exist:
 
-    ansible-playbook -i get_inventory instances_down.yml
+    ansible-playbook -i get_inventory down-instances.yml
                                                               
 
-## install docker 
+## install docker and deploy abaco
 
-    ansible-playbook -i get_inventory deploy-abaco.yml
+    ansible-playbook -i get_inventory up-abaco.yml
+
+## stop abaco daemons
+
+    ansible-playbook -i get_inventory down-abaco.yml

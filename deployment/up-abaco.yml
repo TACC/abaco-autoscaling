@@ -25,7 +25,7 @@
 
   - name: add devicemapper and other support packages
     yum: 
-      name: ['epel-release', 'device-mapper-persistent-data', 'lvm2']
+      name: ['epel-release', 'device-mapper-persistent-data', 'lvm2', 'vim']
       state: present
   
   - name: Add Docker CE repository
@@ -67,6 +67,26 @@
       state: directory
       owner: apim
  
+  - name: remove bad log dirs
+    file:
+      path: "/home/apim/logs/{{item}}"
+      state: absent
+    with_items:
+      - clientg.log
+      - spawner.log
+      - health.log
+
+  - name: create log files
+    copy:
+      content: ""
+      dest: "/home/apim/logs/{{item}}"
+      owner: apim
+      force: no
+    with_items:
+      - clientg.log
+      - spawner.log
+      - health.log
+ 
   - name: abaco.conf
     template:
       src: "{{local_homedir.stdout}}/abaco.conf"
@@ -82,7 +102,7 @@
   - name: docker compose up 
     become: yes
     become_user: apim
-    shell: /usr/local/bin/docker-compose -f docker-compose-compute.yml up
+    shell: /usr/local/bin/docker-compose -f docker-compose-compute.yml up -d
     args:
       chdir: /home/apim
 
