@@ -1,0 +1,6 @@
+#!/bin/bash
+
+ansible-playbook -i get_inventory down-instances.yml 
+ansible-playbook -i get_inventory up-instances.yml 
+ansible-playbook -i get_inventory up-abaco.yml 
+

@@ -27,20 +27,22 @@
     with_items:
       - "{{local_username.stdout}}-compute1"
       - "{{local_username.stdout}}-compute2"
+      - "{{local_username.stdout}}-compute3"
+      - "{{local_username.stdout}}-compute4"
 
-  - name: create servers
-    os_server:
-      state: present
-      name: "{{item}}"
-      image: 5e559e1c-4915-457e-bb02-bdc939a4232c
-      key_name: autoscaling_abaco
-      timeout: 200
-      flavor: m1.tiny
-      nics:
-        - net-id: e34992da-2361-4b12-9c05-d41680f90fc0
-      meta:
-        group: mpackard-servers
-      auto_ip: no
-    with_items:
-      - "{{local_username.stdout}}-server1"
-
+#  - name: create servers
+#    os_server:
+#      state: present
+#      name: "{{item}}"
+#      image: 5e559e1c-4915-457e-bb02-bdc939a4232c
+#      key_name: autoscaling_abaco
+#      timeout: 200
+#      flavor: m1.tiny
+#      nics:
+#        - net-id: e34992da-2361-4b12-9c05-d41680f90fc0
+#      meta:
+#        group: mpackard-servers
+#      auto_ip: no
+#    with_items:
+#      - "{{local_username.stdout}}-server1"
+#
