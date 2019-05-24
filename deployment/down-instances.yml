@@ -15,7 +15,7 @@
     os_server:
       state: absent
       name: "{{item}}"
-      image: 5e559e1c-4915-457e-bb02-bdc939a4232c
+      image: 368d1a0d-cc90-4190-9225-a16004deaad3
       key_name: autoscaling_abaco
       timeout: 200
       flavor: m1.tiny
@@ -25,14 +25,25 @@
         group: mpackard-computes
       auto_ip: no
     with_items:
-      - "{{local_username.stdout}}-compute1"
+      #- "{{local_username.stdout}}-compute1"
       - "{{local_username.stdout}}-compute2"
+      - "{{local_username.stdout}}-compute3"
+      - "{{local_username.stdout}}-compute4"
+      - "{{local_username.stdout}}-compute5"
+      - "{{local_username.stdout}}-compute6"
+      - "{{local_username.stdout}}-compute7"
+      - "{{local_username.stdout}}-compute8"
+      - "{{local_username.stdout}}-compute9"
+      - "{{local_username.stdout}}-compute10"
+      - "{{local_username.stdout}}-compute11"
+      - "{{local_username.stdout}}-compute12"
+      - "{{local_username.stdout}}-compute13"
 
   - name: create servers
     os_server:
       state: absent
       name: "{{item}}"
-      image: 5e559e1c-4915-457e-bb02-bdc939a4232c
+      image: 368d1a0d-cc90-4190-9225-a16004deaad3
       key_name: autoscaling_abaco
       timeout: 200
       flavor: m1.tiny

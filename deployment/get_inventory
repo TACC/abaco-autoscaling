@@ -86,8 +86,8 @@ def init_inventory(username):
   init_inventory = {
     "_meta": {
       "hostvars": {
-        "pubkey": "x",
-        "privke": "y"
+        #"pubkey": "x",
+        #"privkey": "y"
       },
     },
     "all": {

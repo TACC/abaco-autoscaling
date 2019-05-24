@@ -1,0 +1,6 @@
+#!/bin/bash
+
+for i in `./get_inventory  | jq ._meta.hostvars[].ansible_ssh_host -r`
+do 
+  ssh centos@$i 'sudo docker ps -a'
+done

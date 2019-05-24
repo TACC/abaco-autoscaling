@@ -15,7 +15,11 @@ See dynamic inventory:
 
 Use dynamic inventory (e.g. on just computes):
 
-    ansible -i get_inventory computes -a uptime
+    ansible -i get_inventory mpackard-computes -a uptime
+
+To check openstack itself:
+    
+    openstack server list
 
 ## deploy instances
 

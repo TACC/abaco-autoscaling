@@ -1,0 +1,14 @@
+#!/bin/bash
+
+if [ $1 == "YES" ]
+then
+  for i in `./get_inventory  | jq ._meta.hostvars[].ansible_ssh_host -r`
+  do 
+    ssh centos@$i 'sudo docker rm -f `sudo docker ps -a`'
+  done
+else
+  echo "must give YES argument with this script"
+fi
+
+
+
