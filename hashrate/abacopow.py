@@ -3,7 +3,7 @@
 
 from uuid import uuid4
 from agavepy.actors import get_context
-import json, time, copy, hashlib, os
+import json, time, hashlib, os
 
 MAX_NONCE = 2**32       # global max nonce; maximum attempts before failing to find next block
                         # 32-bit system
@@ -29,25 +29,24 @@ def hashBlock(block):
 
 # Mines/hashes until the desired hash is found
 def mineNextBlock(prev_block, start_nonce=0, end_nonce=MAX_NONCE):
-    block_to_mine = copy.deepcopy(prev_block)
-    block_to_mine['nonce'] = start_nonce        # initiates new start nonce
-    bits = block_to_mine['bits']                # pulls the bit value from the block
+    prev_block = copy.deepcopy(prev_block)
+    prev_block['nonce'] = start_nonce        # initiates new start nonce
+    bits = prev_block['bits']                # pulls the bit value from the block
     target = 2 ** (256 - bits)                  # target value (difficulty determined by bits)
 
     # attempts max_nonce times to find hash/int that's less than target
     for nonce in range(start_nonce, end_nonce):
-        hashy = hashBlock(block_to_mine)
+        hashy = hashBlock(prev_block)
 
         if int(hashy, 16) < target:
-            return randomBlock(prev_hash=hashy, hashes=block_to_mine['nonce'], bits=bits)
+            return randomBlock(prev_hash=hashy, hashes=nonce, bits=bits)
 
-        block_to_mine['nonce'] = block_to_mine['nonce'] + 1
+        prev_block['nonce'] = prev_block['nonce'] + 1
 
     print(f'Failed after {MAX_NONCE} (max_nonce) tries\n')
     return randomBlock(prev_hash='FAILED', bits=bits, nonce=MAX_NONCE)
 
-
-if __name__ == '__main__':
+def main():
     start = time.time()
     logs = {}
     logs['messages'] = f'Max Cores: {os.cpu_count()}'
@@ -79,6 +78,9 @@ if __name__ == '__main__':
 
     # sends logs to execution/logs
     print(logs,end='')
+
+if __name__ == '__main__':
+    main()
 
 
 

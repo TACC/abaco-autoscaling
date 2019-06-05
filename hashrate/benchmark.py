@@ -3,6 +3,12 @@ import ast #used for dirty json conversion
 import time
 
 # creates agave stuff
+def hashBlock(block):
+    block_serialization = json.dumps(block, sort_keys=True).encode('utf-8')
+    block_hash = hashlib.sha256(block_serialization).hexdigest()
+
+    return block_hash
+
 class AgaveServer:
 
     def __init__(self):
@@ -166,6 +172,9 @@ class AgaveServer:
                 hashrates.append(log_json['hashrate'])
                 hashes.append(log_json['hashes'])
 
+        # verify each block is correct
+        #self.verify(execs)
+
         # return benchmark for particular inputs
         return {'msgs': msgs,
                 'bits': bits,
@@ -185,13 +194,13 @@ class AgaveServer:
             log = self.ag.actors.getExecutionLogs(actorId=self.actor_id, executionId=eid)['logs']
             if log:
                 log_json = ast.literal_eval(log)
+                print(log_json)
                 genesis_block = log_json['genesis_block']
                 next_block = log_json['next_block']
 
-            block_serialization = json.dumps(genesis_block, sort_keys=True).encode('utf-8')
-            block_hash = hashlib.sha256(block_serialization).hexdigest()
-
-            assert (block_hash == next_block)
+            target = 2 ** (256 - genesis_block['bits'])
+            assert (hashBlock(genesis_block) == next_block)     # checks hash of block matches prev_hash
+            assert (int(hashBlock(next_block),16) < target)     # checks hash is less than target value
 
 def main():
     # maxes out workers on number of nodes(6 workers per medium node)
