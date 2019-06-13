@@ -1,0 +1,15 @@
+#!/bin/bash
+echo How many instances?
+read num_of_instances
+
+x="mpackard-compute"
+
+img="f18d52e7-11f3-4898-93ab-4503da303299"
+nic="e34992da-2361-4b12-9c05-d41680f90fc0"
+key="autoscaling_abaco"
+#flav="m1.small"
+#flav="m1.tiny"
+flav="m1.medium"
+num="--min $num_of_instances --max $num_of_instances"
+
+openstack server create --flavor $flav --image $img --nic net-id=$nic --security-group default --key-name $key --property "group=mpackard-computes" $num $x

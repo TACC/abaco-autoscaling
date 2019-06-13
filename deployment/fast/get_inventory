@@ -1,0 +1,130 @@
+#!/usr/bin/env python3
+
+#import requests
+import json
+import os
+import sys
+import pprint
+import ast
+import openstack
+import getpass
+
+sys.dont_write_bytecode = True
+#openstack.enable_logging(debug=True)
+
+def openstack_connect():
+  try: 
+    return openstack.connect()
+  except:
+    print("Failed to connect to Openstack. Are your OS_ variables set (from openrc)?")
+    sys.exit(1)
+
+
+def get_cached_networks(username):
+  with open('/tmp/'+username+'-networks.json') as f:
+    json_object = json.load(f)
+  return json_object
+
+def cache_networks(username):
+  data = []
+  conn = openstack_connect()
+  for s in conn.network.networks(project_id=os.environ['OS_PROJECT_ID']):
+    data.append(s.to_dict())
+  with open('/tmp/'+username+'-networks.json', 'w') as fp:
+    json.dump(data, fp)
+  return
+
+def get_cached_servers(username):
+  with open('/tmp/'+username+'-servers.json') as f:
+    json_object = json.load(f)
+  return json_object
+
+def cache_servers(username):
+  data = []
+  conn = openstack_connect()
+  for s in conn.compute.servers():
+    data.append(s.to_dict())
+  with open('/tmp/'+username+'-servers.json', 'w') as fp:
+    json.dump(data, fp)
+  return
+
+def get_username():
+  try:
+    return getpass.getuser()
+  except:
+    return 'noname'
+
+def get_server_priv_ip(server, network):
+  try:
+    for address in server['addresses'][network]:
+      if address['OS-EXT-IPS:type'] == 'fixed':
+        return address['addr']
+  except:
+    return None
+
+def get_server_id(server):
+  try:
+    return server['id']
+  except:
+    return None
+
+def get_server_name(server):
+  try:
+    return server['name']
+  except:
+    return None
+
+def get_server_group(server):
+  try: 
+    return server['metadata']['group']
+  except:
+    return None
+
+
+def init_inventory(username):
+  
+  init_inventory = {
+    "_meta": {
+      "hostvars": {
+        #"pubkey": "x",
+        #"privkey": "y"
+      },
+    },
+    "all": {
+      "children": [
+        "ungrouped", 
+        username+"-computes", 
+        username+"-servers", 
+      ]
+    },
+    "ungrouped": { "hosts": []},
+    username+"-computes": { "hosts": []},
+    username+"-servers": { "hosts": []},
+  }
+
+  return init_inventory
+
+
+if __name__ == '__main__':
+  username = get_username()
+
+  inventory = init_inventory(username)
+
+  # uncomment these 2 to pull from openstack live
+  cache_networks(username)
+  cache_servers(username)
+
+  ns = get_cached_networks(username)
+  servers = get_cached_servers(username)
+  netname = ns[0]['name']
+
+  for s in servers:
+    sname = get_server_name(s) 
+    if get_server_group(s) != None:
+      inventory['_meta']['hostvars'][sname] = {'openstack_id': get_server_id(s), 'ansible_ssh_host': get_server_priv_ip(s, netname), 'ansible_user': 'centos'}
+    if get_server_group(s) == username+'-computes':
+      inventory[username+'-computes']['hosts'].append(sname)
+    if get_server_group(s) == username+'-servers':
+      inventory[username+'-servers']['hosts'].append(sname)
+  print(json.dumps(inventory))
+

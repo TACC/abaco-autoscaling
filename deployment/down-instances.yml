@@ -25,7 +25,8 @@
         group: mpackard-computes
       auto_ip: no
     with_items:
-      #- "{{local_username.stdout}}-compute1"
+      - "{{local_username.stdout}}-compute"
+      - "{{local_username.stdout}}-compute1"
       - "{{local_username.stdout}}-compute2"
       - "{{local_username.stdout}}-compute3"
       - "{{local_username.stdout}}-compute4"

@@ -1,0 +1,54 @@
+---
+
+- hosts: all
+  become: true
+  vars:
+ 
+    abaco_host_id: "{{  ansible_ssh_host.split('.')[3] }}"
+
+  tasks:
+
+  - name: get the username running the deploy
+    become: false
+    local_action: command whoami
+    register: local_username
+
+  - name: get the homedir of the user running the deploy
+    become: false
+    local_action: command echo $HOME
+    register: local_homedir
+
+#  - debug: var=local_username
+#  - debug: var=local_homedir
+
+  - fail:
+      msg: "please do not run as root"
+    when: local_username.stdout == "root"
+
+  
+  - name: ensure docker is running
+    service: name=docker state=started enabled=yes
+
+ 
+  - name: abaco.conf
+    template:
+      src: "{{local_homedir.stdout}}/abaco.conf"
+      dest: /home/apim/abaco.conf
+      owner: apim
+
+  - name: docker-compose-compute.yml  
+    template:
+      src: "{{local_homedir.stdout}}/docker-compose-compute.yml"
+      dest: /home/apim/docker-compose-compute.yml
+      owner: apim
+
+  - name: docker compose up 
+    become: yes
+    become_user: apim
+    environment:
+      abaco_path: /home/apim
+      TAG: 1.1.0-perf
+    shell: /usr/local/bin/docker-compose -f docker-compose-compute.yml up -d
+    args:
+      chdir: /home/apim
+

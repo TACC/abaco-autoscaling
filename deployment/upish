@@ -1,0 +1,17 @@
+os server create --name 
+  - name: create computes
+    os_server:
+      state: present
+      name: "{{item}}"
+      image: 368d1a0d-cc90-4190-9225-a16004deaad3
+      key_name: autoscaling_abaco
+      timeout: 200
+      flavor: m1.medium
+      nics:
+        - net-id: e34992da-2361-4b12-9c05-d41680f90fc0
+      meta:
+        group: mpackard-computes
+      auto_ip: no
+    with_items:
+      - "{{local_username.stdout}}-compute1"
+
