@@ -108,7 +108,7 @@
     become_user: apim
     environment:
       abaco_path: /home/apim
-      TAG: dev
+      TAG: 1.1.0-perf
     shell: /usr/local/bin/docker-compose -f docker-compose-compute.yml up -d
     args:
       chdir: /home/apim
