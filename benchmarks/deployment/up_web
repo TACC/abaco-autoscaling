@@ -1,0 +1,10 @@
+#!/bin/bash
+x="ab-perf-dbs"
+
+img="f02c6e1e-a75f-4c36-90b6-fb3850637def"
+nic="e34992da-2361-4b12-9c05-d41680f90fc0"
+key="autoscaling_abaco"
+flav="m1.medium"
+num="--min 1 --max 1"
+
+openstack server create --flavor $flav --image $img --nic net-id=$nic --security-group default --key-name $key $num $x
