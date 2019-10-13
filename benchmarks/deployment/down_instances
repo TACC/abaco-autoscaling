@@ -1,3 +1,0 @@
-#!/bin/bash
-
-./get_inventory  | jq '._meta.hostvars | with_entries(select(.key|match("mpackard-computes"; "i")))[].openstack_id' -r | xargs openstack server delete

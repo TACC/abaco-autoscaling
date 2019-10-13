@@ -1,1 +1,0 @@
-./get_inventory | jq .computes.hosts | jq '. | length'

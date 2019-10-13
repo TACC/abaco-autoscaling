@@ -1,7 +1,0 @@
-#!/bin/bash
-
-
-for i in `./get_inventory  | jq '._meta.hostvars | with_entries(select(.key|match("mpackard-computes"; "i")))[].ansible_ssh_host' -r`
-do 
-  ssh centos@$i 'sudo docker ps'
-done

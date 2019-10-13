@@ -1,3 +1,0 @@
-#!/bin/bash
-
-ansible-playbook --private-key /home/mpackard/jfs-cic.pem -i get_inventory -l ab-perf-db ansible/burn_dbs.yml 

@@ -1,9 +1,0 @@
----
-
-- hosts: all
-  become: true
-  tasks:
-  - name: delete workers
-    become: yes
-    become_user: apim
-    shell: docker ps -a | awk '{ print $1,$13 }' | grep worker_DEV_ | awk '{print $1 }' | xargs -I {} docker container kill {} & docker ps -a | awk '{ print $1,$11 }' | grep worker_DEV_ | awk '{print $1 }' | xargs -I {} docker kill {} & docker ps -a | awk '{ print $1,$12 }' | grep worker_DEV_ | awk '{print $1 }' | xargs -I {} docker kill {}

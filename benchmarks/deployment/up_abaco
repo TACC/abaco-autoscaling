@@ -1,3 +1,0 @@
-#!/bin/bash
-
-ansible-playbook -f 100 -i get_inventory -l mpackard-computes3-9 ansible/up_abaco.yml
