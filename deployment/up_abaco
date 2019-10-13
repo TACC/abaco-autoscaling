@@ -1,0 +1,4 @@
+#!/bin/bash
+# Calls the up_abaco.yml file with ansible for all nodes named "mpackard_computes*".
+
+ansible-playbook -f 100 -i get_inventory -l mpackard-computes* ansible/up_abaco.yml

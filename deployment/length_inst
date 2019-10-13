@@ -1,0 +1,4 @@
+#!/bin/bash
+# Counts the amount of nodes in the computes group of the inventory.
+
+./get_inventory | jq .computes.hosts | jq '. | length'

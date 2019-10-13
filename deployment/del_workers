@@ -1,0 +1,4 @@
+#!/bin/bash
+# Calls the del_workers.yml file with ansible on any servers named "mpackard-computes*".
+
+ansible-playbook -f 100 -i get_inventory -l mpackard-computes* ansible/del_workers.yml 

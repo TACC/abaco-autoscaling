@@ -1,0 +1,4 @@
+#!/bin/bash
+# Runs the down_abaco.yml file with ansible on any node named "mpackard-computes*".
+
+ansible-playbook -f 100 -i get_inventory -l mpackard-computes* ansible/down_abaco.yml 

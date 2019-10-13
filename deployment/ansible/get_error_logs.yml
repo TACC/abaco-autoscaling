@@ -1,0 +1,13 @@
+# Get all level "ERROR" worker logs from Abaco nodes.
+---
+
+- hosts: all
+  become: true
+  tasks:
+  - name: get logs
+    become: yes
+    become_user: apim
+    shell: cat worker.log | grep ERROR
+    debug: k8s_version.stdout
+    args:
+      chdir: /home/apim/logs

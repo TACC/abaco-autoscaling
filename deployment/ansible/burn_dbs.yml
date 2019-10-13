@@ -1,0 +1,29 @@
+# Access the database node(s) and stops all databases, removes all database
+# files, and then starts the databases back up. These databases are RabbitMQ
+# MongoDB, and Redis. Only MongoDB and Redis has files/folders and need
+# deleting; RabbitMQ just gets reset.
+---
+
+- hosts: all
+  become: true
+  tasks:
+  - name: dbs down
+    become: yes
+    become_user: root
+    shell: /usr/local/bin/docker-compose -f docker-compose-dbs.yml down
+    args:
+      chdir: /home/apim
+
+  - name: remove data_files
+    become: yes
+    become_user: root
+    shell: rm -rf mongo_data/* redis_data/*
+    args:
+      chdir: /home/apim
+
+  - name: dbs up
+    become: yes
+    become_user: root
+    shell: /usr/local/bin/docker-compose -f docker-compose-dbs.yml up -d
+    args:
+      chdir: /home/apim

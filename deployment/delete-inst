@@ -1,4 +1,0 @@
-#!/bin/bash
-
-echo "will delete all compute nodes! if you're sure, run this:"
-echo "# ./get_inventory  | jq ._meta.hostvars[].openstack_id -r | xargs openstack server delete"

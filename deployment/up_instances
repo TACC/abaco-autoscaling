@@ -1,0 +1,20 @@
+#!/bin/bash
+# Ask how many instances and initializes that many, placed in the
+# "mpackard-computes" group and named "mpackard-computes#" where the # is
+# the servers index. The image initialized is an image already built and ready,
+# contains docker, docker images needed, and anything else to save building
+# time. Should just work. Initializes OpenStack "m1.medium" nodes with given
+# security key.
+
+echo How many instances?
+read num_of_instances
+
+x="mpackard-computes"
+
+img="8f6e0d74-5b1a-4f29-8b7f-404c5e7f9781" # ver5
+nic="e34992da-2361-4b12-9c05-d41680f90fc0"
+key="autoscaling_abaco"
+flav="m1.medium"
+num="--min $num_of_instances --max $num_of_instances"
+
+openstack server create --flavor $flav --image $img --nic net-id=$nic --security-group default --key-name $key --property "group=mpackard-computes" $num $x

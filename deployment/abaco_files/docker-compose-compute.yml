@@ -1,0 +1,51 @@
+---
+version: "2"
+
+services:
+
+        spawner:
+            image: abaco/core:$TAG
+            command: "python3 -u /actors/spawner.py"
+            environment:
+                AE_IMAGE: "abaco/core"
+                abaco_conf_host_path: ${abaco_path}/abaco.conf
+                _abaco_secret: QJVPzl6s&bfgd@C6iHhAofs
+                TAS_ROLE_ACCT: tas-jetstream
+                TAS_ROLE_PASS: 6GRCOI8zhNh5
+            volumes:
+                - /var/run/docker.sock:/var/run/docker.sock
+                - ./abaco.conf:/etc/service.conf
+                - /home/apim/logs/spawner.log:/var/log/service.log
+
+#        health:
+#            image: abaco/core:$TAG
+#            command: /actors/health_check.sh
+#            environment:
+#                AE_IMAGE: "abaco/core"
+#                TAS_ROLE_ACCT: tas-jetstream
+#                TAS_ROLE_PASS: 6GRCOI8zhNh5
+#                abaco_conf_host_path: ${abaco_path}/abaco.conf
+#            volumes:
+#                - /var/run/docker.sock:/var/run/docker.sock
+#                - ./abaco.conf:/etc/service.conf
+#                - /home/apim/logs/health.log:/var/log/health.log
+
+        clientg:
+            image: abaco/core:$TAG
+            command: "python3 -u /actors/clients.py"
+            volumes:
+                - /var/run/docker.sock:/var/run/docker.sock
+                - ./abaco.conf:/etc/service.conf
+                - /home/apim/logs/clientg.log:/var/log/clientg.log
+            environment:
+                abaco_conf_host_path: ${abaco_path}/local-dev.conf
+                _abaco_secret: QJVPzl6s&bfgd@C6iHhAofs
+                mongo_password:
+                redis_password:
+                _abaco_TACC-PROD_username: abacoadm
+                _abaco_TACC-PROD_password: dU5(9M@nsU2FDFiGm
+                _abaco_IPLANTC-ORG_username: abacosrv1
+                _abaco_IPLANTC-ORG_password: 6sW4c7CgGhyLxpIDpepz
+                TAS_ROLE_ACCT: tas-jetstream
+                TAS_ROLE_PASS: 6GRCOI8zhNh5
+

@@ -1,0 +1,4 @@
+#!/bin/bash
+# Calls the burn_dbs.yml file with ansible on any servers named ab-perf-d*
+
+ansible-playbook -i get_inventory -l ab-perf-d* ansible/burn_dbs.yml 
