@@ -18,8 +18,8 @@ The test suite folder has files meant to actually run the performance study. The
 - Dockerfiles and files neccessary to build the test images
 - A data folder to store results
 
-### Information
+## Information
 Instructions on deploying everything and running the suite of tests is inside their respective folder as continued readmes. These tests were ran at the Texas Advanced Computing Center facilities and as such, had access to some nifty machines. We begin with using TACC's self-service cloud system named Jetstream. This machine has 320 nodes, 7680 cores, and 40 TB of RAM, and operates with OpenStack. You will have to arrive at this point before you are able to "just run" the test suite, even still, you will have to work around any issues that you might face as your situation will not match ours.
 
-### Licensing
+## Licensing
 This project utilizes the GNU General Public License.

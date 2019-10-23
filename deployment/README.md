@@ -38,7 +38,7 @@ Counts the amount of nodes in the computes group of the inventory.
 Calls the up_abaco.yml file with ansible for all nodes named "mpackard_computes*".
 ### up_instances
 Ask how many instances and initializes that many, placed in the "mpackard-computes" group and named "mpackard-computes#" where the # is the server's index. The image initialized is an image already built and ready, contains docker, docker images needed, and anything else to save building time. Should just work. Initializes OpenStack "m1.medium" nodes with given security key.
-## Getting things ready for the test suite.
+## Getting things ready for the test suite
 In our testing we created servers named "mpackard-computes#" where the # is the server's index, these servers are created with the up_instances script. In order to run the test suite you must have more or an equal amount of servers up that you're going to run the test on. This is due to the fact that the test suite does not add servers, it only deletes servers as this insures that any issues in bringing up the servers are seen by the user. If you wanted to run the test suite over 89 nodes, then you would do the following from the deployment folder:
 ```
 ./up_instances
