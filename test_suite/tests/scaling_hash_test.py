@@ -331,8 +331,11 @@ def main():
 
         time.sleep(25)
     
+    # Creates folder if needed    
+    if not os.path.isdir(f'data/scaled/hash'):
+        os.makedirs(f'data/scaled/hash')
     # Saves pandas analytics dataframe to csv in data folder
-    all_data.to_csv(f'data/hash/{num_nodes}_nodes_{num_workers}_workers_{num_runs}_trials.csv')
+    all_data.to_csv(f'data/scaled/hash/{num_nodes}_nodes_{num_workers}_workers_{num_runs}_trials.csv')
 
 
 if __name__ == '__main__':

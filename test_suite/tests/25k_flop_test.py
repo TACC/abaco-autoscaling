@@ -354,10 +354,10 @@ def main():
         delete_actors_and_workers(actor_ids)
     
     # Checks if data folders exist, if they don't create them 
-    if not os.path.isdir(f'data/{SIZE}'):
-        os.makedirs(f'data/{SIZE}')
+    if not os.path.isdir(f'data/nonScaled/{SIZE}'):
+        os.makedirs(f'data/nonScaled/{SIZE}')
     # Saves pandas analytics dataframe to csv in data folder
-    all_data.to_csv(f'data/{SIZE}/{num_nodes}_nodes_{num_workers}_workers_{num_runs}_trials.csv')
+    all_data.to_csv(f'data/nonScaled/{SIZE}/{num_nodes}_nodes_{num_workers}_workers_{num_runs}_trials.csv')
 
 
 if __name__ == '__main__':

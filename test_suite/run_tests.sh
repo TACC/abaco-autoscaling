@@ -13,12 +13,11 @@
 for i in 89 55 34 21 13 8 5 3 2 1
 do
     python3 insts_check.py $i
-    cd ..
+    cd ../deployment
     ./burn_dbs
     ./up_abaco
-    cd test_suite
+    cd ../test_suite
     sleep 10
-
-    python3 <<<test_name_here>>>.py $i
+    python3 tests/<<<test_name_here>>>.py $i
 done
 python3 insts_check.py 0

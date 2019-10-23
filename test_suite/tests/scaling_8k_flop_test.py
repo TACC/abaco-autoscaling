@@ -340,10 +340,10 @@ def main():
         time.sleep(10)
     
     # Checks if data folders exist, if they don't create them 
-    if not os.path.isdir(f'data/{SIZE}'):
-        os.makedirs(f'data/{SIZE}')
+    if not os.path.isdir(f'data/scaled/{SIZE}'):
+        os.makedirs(f'data/scaled/{SIZE}')
     # Saves pandas analytics dataframe to csv in data folder
-    all_data.to_csv(f'data/{SIZE}/{num_nodes}_nodes_{num_workers}_workers_{num_runs}_trials.csv')
+    all_data.to_csv(f'data/scaled/{SIZE}/{num_nodes}_nodes_{num_workers}_workers_{num_runs}_trials.csv')
 
 
 if __name__ == '__main__':
