@@ -1,4 +1,4 @@
 #!/bin/bash
-# Runs the get_error_logs.yml file with ansible on all nodes named "mpackard-computes*".
+# Runs the get_error_logs.yml file with ansible on all nodes named "compute*".
 
-ansible-playbook -f 100 -i get_inventory -l mpackard-computes* ansible/get_error_logs.yml
+ansible-playbook -f 100 -i get_inventory -l compute* ansible/get_error_logs.yml

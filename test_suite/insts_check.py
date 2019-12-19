@@ -4,14 +4,14 @@ import sys
 
 
 def insts_check():
-    cmd_res = subprocess.run(['./length_inst'], stdout=subprocess.PIPE, cwd='../', shell=True)
+    cmd_res = subprocess.run(['./length_inst'], stdout=subprocess.PIPE, cwd='../deployment', shell=True)
     return int(cmd_res.stdout) 
 
 
 def delete_insts(goal_count, insts_count):
-    inventory_res = subprocess.run(['../get_inventory', '|', 'jq'], stdout=subprocess.PIPE)
+    inventory_res = subprocess.run(['./get_inventory', '|', 'jq'], stdout=subprocess.PIPE, cwd='../deployment')
     inventory_dict = json.loads((inventory_res.stdout.decode('UTF-8')))
-    insts_names = inventory_dict['computes']['hosts']
+    insts_names = inventory_dict['compute']['hosts']
     
     del_amo = insts_count - goal_count
     print(f'Deleting {del_amo} instance(s)')

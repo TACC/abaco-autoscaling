@@ -94,12 +94,14 @@ def init_inventory(username):
     },
     "all": {
       "children": [
+        "abaco",
         "base",
-        "computes"
+        "compute"
       ]
     },
+    "abaco": { "hosts": []},
     "base": { "hosts": []},
-    "computes": { "hosts": []}
+    "compute": { "hosts": []}
   }
 
   return init_inventory
@@ -123,11 +125,11 @@ if __name__ == '__main__':
 
     inventory['_meta']['hostvars'][sname] = {'openstack_id': get_server_id(s), 'ansible_ssh_host': get_server_priv_ip(s, netname), 'ansible_user': 'centos'}
     
-    if get_server_group(s) == username+'-computes':
-      inventory['computes']['hosts'].append(sname)
+    if get_server_group(s) == 'compute':
+      inventory['compute']['hosts'].append(sname)
+    elif get_server_group(s) == 'abaco':
+      inventory['abaco']['hosts'].append(sname)
     else:
       inventory['base']['hosts'].append(sname)
-
   inventory['_meta']['hostvars']['ab-perf-db']['ansible_ssh_private_key_file'] = '/home/mpackard/jfs-cic.pem'
   print(json.dumps(inventory))
-

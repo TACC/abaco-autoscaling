@@ -275,7 +275,7 @@ def response_format(rsp):
 def main():
     #num_nodes = int(input('How many nodes are running? '))
     num_nodes = int(sys.argv[1])
-    num_runs = 3
+    num_runs = 1#3
     num_workers = 6 #per actor
     num_actors = num_nodes #int(os.environ.get('NUM_ACTORS', 1))
     num_messages_per_actor = num_workers * 5
@@ -335,7 +335,7 @@ def main():
         print(f"Complete executions: {end_t - wait_t}")
         
         # delete all actors and workers afterwards
-        delete_actors_and_workers(actor_ids)
+#        delete_actors_and_workers(actor_ids)
         
         time.sleep(10)
     

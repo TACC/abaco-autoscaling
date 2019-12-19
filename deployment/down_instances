@@ -1,4 +1,4 @@
 #!/bin/bash
-# Deletes any node with "mpackard-computes" in the name.
+# Deletes any node with "compute" in the name.
 
-./get_inventory  | jq '._meta.hostvars | with_entries(select(.key|match("mpackard-computes"; "i")))[].openstack_id' -r | xargs openstack server delete
+./get_inventory  | jq '._meta.hostvars | with_entries(select(.key|match("compute"; "i")))[].openstack_id' -r | xargs openstack server delete

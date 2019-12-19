@@ -19,27 +19,27 @@ It is possible to have RabbitMQ, Redis, and MongoDB running on the same server a
 The following section with outline the scripts in the deployment field and their purposes. Along with that the section will give instructions on what to do before running the test suite (This section will be repeated in the test suite folder to maintain coherence. A description of scripts is as follows.
 ## Scripts
 ### burn_dbs
-Calls the burn_dbs.yml file with ansible on any servers named ab-perf-d*. This burns down all the databases and removes any saved files from Redis or Mongo.
+Calls the burn_dbs.yml file with ansible on any servers named ab-perf-d\*. This burns down all the databases and removes any saved files from Redis or Mongo.
 ### check_node_containers
  Calls 'docker ps' for each node and prints it to screen. This allows you to see container status on all the nodes
 ### del_workers
-Calls the del_workers.yml file with ansible on any servers named "mpackard-computes*". This deletes all docker containers with "worker" in the name, thus getting rid of all workers.
+Calls the del_workers.yml file with ansible on any servers named "compute\*". This deletes all docker containers with "worker" in the name, thus getting rid of all workers.
 ### down_abaco
-Runs the down_abaco.yml file with ansible on any node named "mpackard-computes*". Deletes all docker images on the node, allowing everything to start fresh again.
+Runs the down_abaco.yml file with ansible on any node named "compute\*". Deletes all docker images on the node, allowing everything to start fresh again.
 ### down_instances
-Deletes any node with "mpackard-computes" in the name. This deletes all compute nodes, you should do this before stepping away as computer resources are finite and other users might be in queue. Forgetting to do this might also throw your project over allocation bounds with XSEDE.
+Deletes any node with "compute\*" in the name. This deletes all compute nodes, you should do this before stepping away as compute resources are finite and other users might be in queue. Forgetting to do this might also throw your project over allocation bounds with XSEDE.
 ### get_error_logs
-Runs the get_error_logs.yml file with ansible on all nodes named "mpackard-computes*". Get error level abaco logs from all nodes if the abaco.conf file has error logs printing.
+Runs the get_error_logs.yml file with ansible on all nodes named "compute\*". Get error level abaco logs from all nodes if the abaco.conf file has error logs printing.
 ### get_inventory
 Sets up an inventory using information from openstack to allow for ansible to have server names, keys, and any extra information needed. Requires you to log in with your openstack credentials.
 ### length_inst
-Counts the amount of nodes in the computes group of the inventory.
+Counts the amount of nodes in the compute group of the inventory.
 ### up_abaco
-Calls the up_abaco.yml file with ansible for all nodes named "mpackard_computes*".
+Calls the up_abaco.yml file with ansible for all nodes named "compute\*".
 ### up_instances
-Ask how many instances and initializes that many, placed in the "mpackard-computes" group and named "mpackard-computes#" where the # is the server's index. The image initialized is an image already built and ready, contains docker, docker images needed, and anything else to save building time. Should just work. Initializes OpenStack "m1.medium" nodes with given security key.
+Ask how many instances and initializes that many, placed in the "compute" group and named "compute\*" where the \* is the server's index. The image initialized is an image already built and ready, contains docker, docker images needed, and anything else to save building time. Should just work. Initializes OpenStack "m1.medium" nodes with given security key.
 ## Getting things ready for the test suite
-In our testing we created servers named "mpackard-computes#" where the # is the server's index, these servers are created with the up_instances script. In order to run the test suite you must have more or an equal amount of servers up that you're going to run the test on. This is due to the fact that the test suite does not add servers, it only deletes servers as this insures that any issues in bringing up the servers are seen by the user. If you wanted to run the test suite over 89 nodes, then you would do the following from the deployment folder:
+In our testing we created servers named "compute\*" where the \* is the server's index, these servers are created with the up_instances script. In order to run the test suite you must have more or an equal amount of servers up that you're going to run the test on. This is due to the fact that the test suite does not add servers, it only deletes servers as this insures that any issues in bringing up the servers are seen by the user. If you wanted to run the test suite over 89 nodes, then you would do the following from the deployment folder:
 ```
 ./up_instances
 ```
