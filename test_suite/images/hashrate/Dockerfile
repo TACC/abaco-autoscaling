@@ -1,6 +1,6 @@
 # Image.
 FROM python:3.7-alpine
 
-ADD hash.py .
+ADD hashrate.py .
 
-CMD ["python3", "hash.py"]
+CMD ["python3", "hashrate.py"]
