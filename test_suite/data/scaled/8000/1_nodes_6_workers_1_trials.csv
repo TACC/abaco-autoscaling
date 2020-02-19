@@ -1,2 +1,0 @@
-,Run #,Threads,Standard Deviation,Size,Executions,Complete Run Time,Startup Workers,Workers Ready,Message Time,Post Message Time,Exec Init Time,Exec Run Time,Whole Work Time,Calc Time
-0,1,0,1000,8000,30,221.29520603083074,8.530914783477783e-07,2.3006378281861544,0.36292485147714615,218.46441053971648,28.026808,1093.4034659999998,1079.6985189914703,867.9957270622253
