@@ -1,3 +1,9 @@
+"""
+Start performance test with:
+    python3 performance_test.py #numNodes #trialNum #autoscaling
+                                #flopsOrhashrate #sizeOfMatrix or amoOfHashes
+                                #numWorkersPerActor #numMessagesPerWorker
+"""
 import json
 import multiprocessing
 import os
@@ -9,17 +15,32 @@ import pandas as pd
 from datetime import datetime
 from dateutil.parser import parse
 
-HASHES = 3000000
+NUM_NODES = NUM_ACTORS = int(sys.argv[1])
+TRIAL_NUM = int(sys.argv[2])
+AUTOSCALING = sys.argv[3].lower() == 'true'
+TRIAL_TYPE = sys.argv[4].lower()
+if TRIAL_TYPE == "flops":
+    SIZE = int(sys.argv[5])
+    THREADS = 0
+    STD_DEV = 1000
+elif TRIAL_TYPE == "hashrate":
+    HASHES = int(sys.argv[5]
+else:
+    raise KeyError(TRIAL_TYPE must be "hashrate" or "flops")
+NUM_WORKERS_PER_ACTOR = int(sys.argv[6])
+NUM_MESSAGES_PER_WORKER = int(sys.argv[7]) 
+NUM_MESSAGES_PER_ACTOR = NUM_WORKERS_PER_ACTOR * NUM_MESSAGES_PER_WORKER
 
 with open('jwt-abaco_admin', 'r') as f:
     JWT_DEFAULT = f.read()
-
 HEADERS = {'X-Jwt-Assertion-DEV': JWT_DEFAULT}
-
 BASE = 'http://129.114.104.189'
 
 def register_actor(idx):
-    data = {'image': 'kreshel/pow:3', 'name': f'abaco_hash_test_{idx}'}
+    if TRIAL_TYPE == 'flops':
+    	data = {'image': 'abacosamples/abaco_perf_flops:7.0', 'name': f'abaco_flops_test_{idx}'}
+    else:
+        data = {'image': 'abacosamples/abaco_perf_hashrate:3', 'name': f'abaco_hashrate_test_{idx}'}
     rsp = requests.post(f'{BASE}/actors', data=data, headers=HEADERS)
     result = basic_response_checks(rsp)
     return result['id']
@@ -36,22 +57,23 @@ def check_for_ready(actor_ids):
     :return:
     """
     for aid in actor_ids:
-        # check for workers to be ready
-        idx = 0
-        ready = False
-        while not ready and idx < 60:
-            url = '{}/actors/{}/workers'.format(BASE, aid)
-            rsp = requests.get(url, headers=HEADERS)
-            result = basic_response_checks(rsp)
-            for worker in result:
-                if not worker['status'] == 'READY':
-                    idx = idx + 1
-                    time.sleep(2)
-                    continue
-                ready = True
-        if not ready:
-            print("ERROR - workers for actor {} never entered READY status.")
-            raise Exception()
+        if not AUTOSCALING:
+	    # check for workers to be ready
+	    idx = 0
+	    ready = False
+	    while not ready and idx < 60:
+		url = '{}/actors/{}/workers'.format(BASE, aid)
+		rsp = requests.get(url, headers=HEADERS)
+		result = basic_response_checks(rsp)
+		for worker in result:
+		    if not worker['status'] == 'READY':
+			idx = idx + 1
+			time.sleep(2)
+			continue
+		    ready = True
+	    if not ready:
+		print("ERROR - workers for actor {} never entered READY status.")
+		raise Exception()
         # now check that the actor itself is ready -
         ready = False
         idx = 0
@@ -106,14 +128,6 @@ def send_one_message(actor_ids):
         prime_execution_ids[aid].append(ex_id)
     print("All primer messages sent.")
     
-    #print("Deleting priming executions.")
-    #for aid in prime_execution_ids:
-    #    for exec_id in prime_execution_ids[aid]:
-    #        print(aid, exec_id)
-    #        del_exec_res = requests.delete(f"{BASE}/actors/{aid}/executions/{exec_id}", headers=HEADERS)
-    #print(del_exec_res.content)
-    #print("Priming executions deleted.")
-
 def send_messages(actor_ids, num_messages_per_actor):
     execution_ids = {}
     for idx, aid in enumerate(actor_ids):
@@ -128,7 +142,12 @@ def send_messages(actor_ids, num_messages_per_actor):
     return execution_ids
 
 def _thread_send_actor_message(url):
-    data = {'message': HASHES}
+    
+
+    if TRIAL_TYPE == 'flops':
+    	data = {'message': f'{THREADS} {STD_DEV} {SIZE}'}
+    else:
+        data = {'message': HASHES}
     try:
         rsp = requests.post(url, headers=HEADERS, data=data)
     except Exception as e:
@@ -143,6 +162,7 @@ def send_messages_threaded(actor_ids, num_messages_per_actor):
     POOL_SIZE = os.environ.get('POOL_SIZE', 16)
     print(f"using pool of size: {POOL_SIZE}")
     pool = multiprocessing.Pool(processes=POOL_SIZE)
+    total_messages = len(actor_ids) * num_messages_per_actor
     # this is a list with a URL for every message we want to send
     urls = [f'{BASE}/actors/{aid}/messages' for aid in actor_ids] * num_messages_per_actor
     execution_urls = pool.map(_thread_send_actor_message, urls)
@@ -200,24 +220,25 @@ def exec_analytics(all_data, execution_urls, start_t, end_t, reg_t, work_t, read
     exec_run_times = 0
     for exec_url in execution_urls:
         try:
-            exec_logs_r = requests.get(f"{exec_url}/logs",
-                                     headers=HEADERS)
+            exec_logs_r = requests.get(f"{exec_url}/logs", headers=HEADERS)
             exec_logs = exec_logs_r.json()['result']['logs']
         except:
             print(exec_logs_r.content)
             raise
-
-        work_time = float(exec_logs.replace('}', '').replace(',', '').split()[1])
-        whole_work_times += work_time
-
+	if TRIAL_TYPE == 'flops':
+	    whole_work_time, calc_time = list(map(float, exec_logs.replace('\n','').split()))
+	    whole_work_times += whole_work_time
+	    calc_times += calc_time
+	else:
+            whole_work_times 
+	    whole_work_times += whole_work_time
+	    calc_times += whole_work_time
         try:
-            exec_res_r = requests.get(f"{exec_url}",
-                                    headers=HEADERS)
+            exec_res_r = requests.get(f"{exec_url}", headers=HEADERS)
             exec_res = exec_res_r.json()['result']
         except:
             print(exec_res_r.content)
             raise
-
         msg_receive_time = parse(exec_res['message_received_time'].replace(' ','T') + 'Z')
         exec_start_time = parse(exec_res['start_time'].replace(' ', 'T') + 'Z')
         exec_start_run_time = parse(exec_res['final_state']['StartedAt'])
@@ -230,15 +251,20 @@ def exec_analytics(all_data, execution_urls, start_t, end_t, reg_t, work_t, read
         exec_run_times += exec_run_time
 
     run_data = pd.DataFrame(
-        [[run_num, len(execution_urls), end_t - start_t, work_t - reg_t, ready_t - reg_t, send_t - ready_t, end_t - wait_t,
-            exec_init_times, exec_run_times, whole_work_times]],
-        columns=['Run #', 'Executions', 'Complete Run Time', 'Startup Workers', 'Workers Ready',
-                    'Message Time', 'Post Message Time', 'Exec Init Time', 'Exec Run Time', 'Whole Work Time'])
+        [[run_num, len(execution_urls), end_t - start_t,
+          work_t - reg_t, ready_t - reg_t, send_t - ready_t,
+          end_t - wait_t, exec_init_times, exec_run_times,
+          whole_work_times, calc_times]],
+        columns=['Run #', 'Executions', 'Complete Run Time',
+                 'Startup Workers', 'Workers Ready', 'Message Time',
+                 'Post Message Time', 'Exec Init Time', 'Exec Run Time',
+                 'Whole Work Time', 'Calc Time'])
     all_data = all_data.append(run_data, ignore_index = True)
     return all_data
 
 def delete_actors_and_workers(actor_ids):
     actor_worker_links = {}
+    num_workers = 0
     for actor_id in actor_ids:
         worker_res = requests.get(f"{BASE}/actors/{actor_id}/workers", headers=HEADERS).json()['result']
         actors_workers_ids = []
@@ -277,80 +303,83 @@ def response_format(rsp):
     assert 'version' in data.keys()
     return data
 
-
 def main():
-    # maxes out workers on number of nodes(6 workers per medium node)
-    #nodes = int(input('How many nodes are active? '))
-    num_nodes = int(sys.argv[1])
-    num_runs = 5
-    num_workers = 6 #per actor
-    num_actors = num_nodes
-    num_messages_per_actor = num_workers * 6
-
     all_data = pd.DataFrame()
     
-    for run_num in range(1, num_runs + 1):
-        print(f'\nStarting Run {run_num}')
-        actor_ids = []
+    print(f'\nStarting run {TRIAL_NUM}')
+    actor_ids = []
 
-        start_t = timeit.default_timer()
-        for i in range(num_actors):
-            aid = register_actor(i)
-            actor_ids.append(aid)
-            print(f"registered actor # {i}; id: {aid}")
+    start_t = timeit.default_timer()
+    for i in range(NUM_ACTORS):
+	aid = register_actor(i)
+	actor_ids.append(aid)
+	print(f"registered actor # {i}; id: {aid}")
 
-        reg_t = timeit.default_timer()
-        
-        # start up workers
-        for aid in actor_ids:
-            start_workers(aid, num_workers)
-            print(f"workers started for {aid}")
+    reg_t = timeit.default_timer()
+    if not AUTOSCALING:
+	    # start up workers
+	    for aid in actor_ids:
+		start_workers(aid, NUM_WORKERS_PER_ACTOR)
+		print(f"workers started for {aid}")
 
-        work_t = timeit.default_timer()
-        print('Waiting for ready')
-        # wait for actors and workers to reach READY status
-        check_for_ready(actor_ids)
-        
-        # send a "primer" message -
-        send_one_message(actor_ids)
+    work_t = timeit.default_timer()
+    print('Waiting for ready')
+    # wait for actors and workers to reach READY status
+    check_for_ready(actor_ids)
+    
+    # send a "primer" message -
+    send_one_message(actor_ids)
 
-        ready_t = timeit.default_timer()
+    ready_t = timeit.default_timer()
+    
+    # send actors messages -
+    THREADED = os.environ.get('THREADED_MESSAGES', 'TRUE')
+    if THREADED == 'TRUE':
+	execution_urls = send_messages_threaded(actor_ids, NUM_MESSAGES_PER_ACTOR)
+    else:
+	execution_urls = send_messages(actor_ids, NUM_MESSAGES_PER_ACTOR)
 
-        # send actors messages -
-        THREADED = os.environ.get('THREADED_MESSAGES', 'TRUE')
-        if THREADED == 'TRUE':
-            execution_urls = send_messages_threaded(actor_ids, num_messages_per_actor)
-        else:
-            execution_urls = send_messages(actor_ids, num_messages_per_actor)
+    send_t = timeit.default_timer()
+    
+    wait_t = timeit.default_timer()
+    
+    # check for executions to complete
+    check_for_complete(actor_ids)
+    end_t = timeit.default_timer()
+    
+    # run analytics on executions
+    all_data = exec_analytics(all_data, execution_urls, start_t,
+                              end_t, reg_t, work_t,
+                              ready_t, send_t, wait_t,
+                              TRIAL_NUM, NUM_NODES, NUM_WORKERS_PER_ACTOR)
 
-        send_t = timeit.default_timer()
-        
-        wait_t = timeit.default_timer()
-        
-        # check for executions to complete
-        check_for_complete(actor_ids)
-        end_t = timeit.default_timer()
-        
-        # run analytics on executions
-        all_data = exec_analytics(all_data, execution_urls, start_t, end_t, reg_t, work_t, ready_t, send_t, wait_t, run_num, num_nodes, num_workers, num_runs)
+    print(f"Final times -- ")
+    print(f"complete run: {end_t - start_t}")
+    print(f"Register: {reg_t - start_t}")
+    print(f"Start up workers: {work_t - reg_t}")
+    print(f"Workers ready: {ready_t - reg_t}")
+    print(f"Send messages: {send_t - ready_t}")
+    print(f"Complete executions: {end_t - wait_t}")
+    
+    # delete all actors and workers afterwards
+    delete_actors_and_workers(actor_ids)
+   
+    # Config data saving 
+    if TRIAL_TYPE == 'flops':
+        save_folder = f'data/scaling-{AUTOSCALING}/{SIZE}'
+    else:
+        save_folder = "data/hashrate/SIZE/"
+    save_name = f'{NUM_NODES}_nodes_{NUM_WORKERS_PER_ACTOR}_workers_{num_runs}_trials.csv'
 
-        print(f"Final times -- ")
-        print(f"Complete Run: {end_t - start_t}")
-        print(f"Register: {reg_t - start_t}")
-        print(f"Start up workers: {work_t - reg_t}")
-        print(f"Workers ready: {ready_t - reg_t}")
-        print(f"Send messages: {send_t - ready_t}")
-        print(f"Complete executions: {end_t - wait_t}")
-        
-        # delete all actors and workers afterwards
-        delete_actors_and_workers(actor_ids)
+    # Checks if data folders exist, if they don't create them 
+    if not os.path.isdir(save_folder):
+        os.makedirs(save_folder)
 
-    # Creates folder if needed    
-    if not os.path.isdir(f'data/nonScaled/hash'):
-        os.makedirs(f'data/nonScaled/hash')
-    # Saves pandas analytics dataframe to csv in data folder
-    all_data.to_csv(f'data/nonScaled/hash/{num_nodes}_nodes_{num_workers}_workers_{num_runs}_trials.csv')
-
+    # Saves pandas analytics dataframe to csv in data folder 
+    if TRIAL_NUM = 1:
+        all_data.to_csv(f'{save_folder}/{save_name}', mode='w')
+    else:
+        all_data.to_csv(f'{save_folder}/{save_name}', mode='a')
 
 if __name__ == '__main__':
     main()
