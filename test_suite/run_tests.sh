@@ -10,19 +10,21 @@
 # seconds to allow initialization time, then runs the test. This occurs for
 # each node count and finally all nodes are deleted.
 
-for nodes in 89 # 55 34 21 13 8 5 3 2 1
+for nodes in 1
 do
     python3 insts_check.py $nodes
-    cd ../deployment
-    ./burn_dbs
-    ./up_abaco
-    cd ../test_suite
-    sleep 10
-    #python3 tests/25k_flop_test.py $nodes
-    #python3 tests/8k_flop_test.py $nodes
-    python3 tests/hash_test.py $nodes
-    #python3 tests/scaling_25k_flop_test.py $nodes
-    #python3 tests/scaling_8k_flop_test.py $nodes
-    #python3 tests/scaling_hash_test.py $nodes
+    for trial in 1
+        do
+	    cd ../deployment
+            ./burn_mongo
+            ./burn_web
+	    ./burn_dbs
+            ./down_abaco
+            sleep 10
+            ./down_abaco
+	    ./up_abaco
+	    cd ../test_suite
+	    sleep 10
+	    python3 tests/worker_test.py $nodes $trial
+        done
 done
-#python3 insts_check.py 0

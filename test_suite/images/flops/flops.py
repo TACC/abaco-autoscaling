@@ -5,18 +5,24 @@ Abaco. Does some cool multi-threaded math and outputs total time to completion.
 import os
 import time
 
-threads, std_dev, size = map(int, os.environ.get('MSG').split())
+#threads, std_dev, size, iterations = map(int, os.environ.get('MSG').split())
+threads = 0
+std_dev = 1000
+size = 8000
+iterations = 500000000
 
 if threads:
     os.environ["OMP_NUM_THREADS"] = str(threads)
 
 import numpy
 whole_start = time.time()
-A = numpy.random.normal(0, std_dev, (size, size))
-B = numpy.random.normal(0, std_dev, (size, size))
+#A = numpy.random.normal(0, std_dev, (size, size))
+#B = numpy.random.normal(0, std_dev, (size, size))
 
 calc_start = time.time()
-C = numpy.dot(A, B)
+for _ in range(iterations):
+    4 * 6
+    #numpy.dot(A, B)
 
 end = time.time()
 
