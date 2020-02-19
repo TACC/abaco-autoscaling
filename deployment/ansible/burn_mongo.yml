@@ -1,0 +1,11 @@
+# Turns docker back on after rebooting a server. Should have './burn_dbs' run
+# afterwards to start database.
+---
+
+- hosts: all
+  become: true
+  tasks:
+  - name: start docker
+    become: yes
+    become_user: root
+    shell: service docker start

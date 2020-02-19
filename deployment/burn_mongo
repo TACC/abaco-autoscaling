@@ -1,0 +1,8 @@
+#!/bin/bash
+# Reboots and reinitializes the mongo server just for when it crashes.
+
+openstack server reboot ab-perf-db
+sleep 20
+openstack server reboot ab-perf-db
+sleep 180
+ansible-playbook -i get_inventory -l ab-perf-db ansible/burn_mongo.yml 

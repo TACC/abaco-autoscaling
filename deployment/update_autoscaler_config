@@ -1,0 +1,4 @@
+#!/bin/bash
+# Changes the config for ab-perf-prom and resets it
+
+ansible-playbook -i get_inventory -l ab-perf-prom ansible/update_autoscalering_config.yml 

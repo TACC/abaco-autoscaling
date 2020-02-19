@@ -1,0 +1,19 @@
+# Access the web node and reboots the docker-compose file
+---
+
+- hosts: all
+  become: true
+  tasks:
+  - name: web down
+    become: yes
+    become_user: root
+    shell: /usr/local/bin/docker-compose -f docker-compose-web.yml down
+    args:
+      chdir: /home/apim
+
+  - name: web up
+    become: yes
+    become_user: root
+    shell: /usr/local/bin/docker-compose -f docker-compose-web.yml up -d
+    args:
+      chdir: /home/apim

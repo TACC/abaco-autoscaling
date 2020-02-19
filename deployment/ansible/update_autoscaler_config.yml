@@ -1,0 +1,39 @@
+# Reboots the docker-compose file for the autoscaler features after grabbing
+# the newest config files from the perf directory.
+---
+
+- hosts: all
+  gather_facts: no
+  become: true
+  vars:
+    abaco_host_id: "{{  ansible_ssh_host.split('.')[3] }}"
+  tasks:
+  - name: get the homedir of the user running the deploy
+    become: false
+    local_action: command echo $HOME
+    register: local_homedir
+  
+  - name: prom down
+    become: yes
+    become_user: root
+    shell: /usr/local/bin/docker-compose -f docker-compose-prom.yml down
+    args:
+      chdir: /home/apim
+  
+  - name: prune
+    become: yes
+    become_user: root
+    shell: docker volume prune -f && docker container prune -f
+
+  - name: abaco.conf
+    template:
+      src: "{{local_homedir.stdout}}/abaco-autoscaling/deployment/abaco_files/abaco.conf"
+      dest: /home/apim/abaco.conf
+      owner: apim
+
+  - name: prom up
+    become: yes
+    become_user: root
+    shell: /usr/local/bin/docker-compose -f docker-compose-prom.yml up -d
+    args:
+      chdir: /home/apim

@@ -1,0 +1,4 @@
+#!/bin/bash
+# Calls the burn_web.yml file with ansible on any servers named ab-perf-web*
+
+ansible-playbook -i get_inventory -l ab-perf-web ansible/burn_web.yml 
